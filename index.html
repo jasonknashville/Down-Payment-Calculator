@@ -1,499 +1,675 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- Google Tag Manager -->
+  <script>
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-MH9X9NGV');
+  </script>
+  <!-- End Google Tag Manager -->
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Down Payment + PITI Estimator (TN)</title>
+  <title>Down Payment + Monthly Payment Calculator</title>
+
+  <!-- ... your CSS stays here ... -->
+</head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Down Payment + Monthly Payment Calculator</title>
   <style>
     :root{
-      --bg:#0b1220;
-      --card:#0f1a2d;
-      --muted:#a9b6d3;
-      --text:#e9eefc;
-      --accent:#38bdf8;
-      --accent2:#22c55e;
-      --warn:#f59e0b;
-      --danger:#fb7185;
-      --border: rgba(255,255,255,.10);
+      --bg:#0b1220; --card:#0f1a2f; --muted:#9fb0d0; --text:#eaf0ff;
+      --accent:#5dd6ff; --accent2:#a8ff78; --warn:#ffd38a; --danger:#ff9aa6;
+      --border:rgba(255,255,255,.10);
       --shadow: 0 10px 30px rgba(0,0,0,.35);
-      --radius: 18px;
-      --radius2: 12px;
-      --pad: 18px;
-      font-synthesis-weight:none;
+      --radius:16px;
     }
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(900px 500px at 15% 10%, rgba(56,189,248,.12), transparent),
-                  radial-gradient(900px 500px at 80% 20%, rgba(34,197,94,.10), transparent),
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 700px at 20% 0%, rgba(93,214,255,.12), transparent 60%),
+                  radial-gradient(1200px 700px at 80% 20%, rgba(168,255,120,.10), transparent 60%),
                   var(--bg);
       color:var(--text);
-      line-height:1.35;
+      padding: 26px;
     }
-    .wrap{ max-width: 1050px; margin: 28px auto 48px; padding: 0 18px; }
-    header{
-      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
-      margin-bottom: 16px;
+    .wrap{max-width: 1050px; margin:0 auto;}
+    header{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:18px;}
+    h1{font-size: 22px; margin:0 0 6px 0;}
+    .sub{color:var(--muted); font-size: 13px; line-height:1.35}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
     }
-    h1{ font-size: 22px; margin: 0 0 6px; letter-spacing: .2px; }
-    .sub{ color: var(--muted); font-size: 13px; margin:0; max-width: 700px; }
-    .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items:start; }
-    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
-
+    @media (max-width: 920px){ .grid{grid-template-columns:1fr;} }
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), transparent), var(--card);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: var(--pad);
+      padding: 16px;
     }
-    .card h2{ margin:0 0 10px; font-size: 15px; letter-spacing:.2px; }
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    @media (max-width: 620px){ .row{ grid-template-columns: 1fr; } }
-
-    label{ display:block; font-size: 12px; color: var(--muted); margin: 10px 0 6px; }
+    .section-title{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+    .section-title h2{font-size: 14px; letter-spacing:.4px; text-transform:uppercase; margin:0; color: rgba(234,240,255,.85);}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin:12px 0;}
+    @media (max-width: 560px){ .row{grid-template-columns:1fr;} }
+    label{display:block; font-size:12px; color: rgba(234,240,255,.80); margin-bottom:6px;}
     input, select{
       width:100%;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 12px;
       padding: 11px 12px;
-      font-size: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(10,16,30,.65);
+      color: var(--text);
       outline: none;
     }
-    input:focus, select:focus{ border-color: rgba(56,189,248,.6); box-shadow: 0 0 0 3px rgba(56,189,248,.15); }
-    .hint{ font-size: 12px; color: var(--muted); margin-top: 6px; }
-
-    /* Toggle */
+    input:focus, select:focus{border-color: rgba(93,214,255,.55); box-shadow: 0 0 0 3px rgba(93,214,255,.12);}
+    .pill{
+      display:inline-flex; gap:8px; align-items:center; padding:8px 10px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:999px;
+      background: rgba(10,16,30,.45);
+      font-size:12px; color: rgba(234,240,255,.88);
+    }
     .toggle{
-      display:inline-flex; gap:0; border:1px solid var(--border);
-      border-radius: 999px; overflow:hidden; background: rgba(255,255,255,.03);
+      display:inline-flex; border:1px solid rgba(255,255,255,.12);
+      border-radius:999px; overflow:hidden;
     }
     .toggle button{
-      appearance:none; border:0; background:transparent; color: var(--muted);
-      padding: 9px 12px; font-size: 13px; cursor:pointer;
-      min-width: 124px;
+      appearance:none; border:0; padding:8px 12px; cursor:pointer;
+      background: transparent; color: rgba(234,240,255,.75); font-weight:600; font-size:12px;
     }
     .toggle button.active{
-      background: rgba(56,189,248,.18);
+      background: rgba(93,214,255,.18);
       color: var(--text);
     }
-
-    .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      border:1px solid var(--border); border-radius:999px;
-      padding: 8px 10px; font-size: 12px; color: var(--muted);
-      background: rgba(255,255,255,.03);
+    .hint{
+      font-size:12px; color: var(--muted); line-height:1.3; margin-top:8px;
     }
-    .pill b{ color: var(--text); font-weight:600; }
-
-    .hr{ height:1px; background: var(--border); margin: 14px 0; }
-
-    .toast{
-      display:none;
-      border:1px solid rgba(245,158,11,.45);
-      background: rgba(245,158,11,.12);
-      color: var(--text);
-      border-radius: 14px;
-      padding: 10px 12px;
-      margin-top: 10px;
-      font-size: 13px;
-    }
-    .toast.show{ display:block; }
-
     .mini{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      margin-top: 10px;
+      font-size:11px; color: rgba(234,240,255,.68);
     }
-    .kpis{
-      display:grid; gap:10px;
+    .subgrid{
+      display:grid; grid-template-columns: 1fr 1fr; gap:12px;
+      margin-top:10px;
     }
+    @media (max-width: 560px){ .subgrid{grid-template-columns:1fr;} }
+    .note{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,211,138,.30);
+      background: rgba(255,211,138,.10);
+      color: rgba(255,241,218,.95);
+      font-size: 12px;
+      display:none;
+    }
+    .danger{
+      border-color: rgba(255,154,166,.35);
+      background: rgba(255,154,166,.10);
+      color: rgba(255,235,238,.95);
+    }
+    .out{
+      display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;
+    }
+    @media (max-width:560px){ .out{grid-template-columns:1fr;} }
     .kpi{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
       padding: 12px;
+      background: rgba(10,16,30,.45);
     }
-    .kpi .t{ color: var(--muted); font-size: 12px; }
-    .kpi .v{ font-size: 18px; margin-top: 4px; letter-spacing:.2px; }
-    .kpi .s{ color: var(--muted); font-size: 12px; margin-top: 4px; }
-
-    .ok{ color: var(--accent2); }
-    .warn{ color: var(--warn); }
-    .bad{ color: var(--danger); }
-
-    .foot{
-      margin-top: 12px;
-      font-size: 12px;
-      color: var(--muted);
+    .kpi .k{font-size:11px; color: rgba(234,240,255,.70); text-transform:uppercase; letter-spacing:.35px;}
+    .kpi .v{font-size: 18px; margin-top:6px; font-weight:800;}
+    .kpi .s{font-size:12px; color: rgba(234,240,255,.72); margin-top:2px;}
+    footer{margin-top:14px; color: rgba(234,240,255,.55); font-size:11px; line-height:1.35}
+    .rightTop{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .btn{
+      padding:9px 11px; border-radius: 12px; border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,16,30,.55); color: rgba(234,240,255,.85); cursor:pointer; font-weight:700; font-size:12px;
     }
-    .foot a{ color: var(--accent); text-decoration: none; }
-    .foot a:hover{ text-decoration: underline; }
-
-    .smallnote{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      border-left: 3px solid rgba(56,189,248,.5);
-      padding-left: 10px;
-    }
+    .btn:hover{border-color: rgba(93,214,255,.45);}
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Down Payment + Payment Estimator (TN)</h1>
-        <p class="sub">
-          Friendly for first-time buyers <em>and</em> repeat buyers: enter a purchase price, down payment, and pick a TN county for property tax estimates.
-          (City/urban service add-ons vary; this is a planning tool.)
-        </p>
-      </div>
-      <div class="pill">
-        <span>Mode:</span> <b id="modeLabel">First-time buyer</b>
-      </div>
-    </header>
+  <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MH9X9NGV"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
 
-    <div class="grid">
-      <!-- INPUTS -->
-      <section class="card">
-        <h2>Inputs</h2>
+  <!-- ... the rest of your page ... -->
 
-        <label>First-time homebuyer?</label>
-        <div class="toggle" role="tablist" aria-label="First-time buyer toggle">
-          <button id="btnYes" class="active" type="button">Yes</button>
-          <button id="btnNo" type="button">No</button>
-        </div>
-
-        <div class="row">
-          <div>
-            <label>Estimated Home Purchase Price</label>
-            <input id="price" inputmode="decimal" placeholder="e.g., 350000" value="350000" />
-            <div class="hint">Tip: You can paste a number like 350000 or 350,000.</div>
-          </div>
-
-          <div>
-            <label>Down Payment (percent)</label>
-            <input id="dpPct" inputmode="decimal" placeholder="e.g., 3.5" value="3.5" />
-            <div class="hint">Last field edited wins (% or $).</div>
-          </div>
-
-          <div>
-            <label>Down Payment (dollars)</label>
-            <input id="dpAmt" inputmode="decimal" placeholder="e.g., 12250" />
-            <div class="hint">Auto-calculated when you edit the %.</div>
-          </div>
-
-          <div>
-            <label>Interest Rate (%)</label>
-            <input id="rate" inputmode="decimal" value="6.25" />
-            <div class="hint">Assumes 30-year fixed (editable in code if needed).</div>
-          </div>
-        </div>
-
-        <div id="dpToast" class="toast" aria-live="polite">
-          <b>Heads up:</b> Your down payment is under <b>3.5%</b>.
-          There are loan options that can go below 3.5% down in some cases — <b>please inquire</b>.
-        </div>
-
-        <div class="hr"></div>
-
-        <h2>Down payment sources</h2>
-        <div class="row">
-          <div>
-            <label>Savings</label>
-            <input id="srcSavings" inputmode="decimal" placeholder="0" value="0" />
-          </div>
-
-          <div id="equityWrap">
-            <label>Equity / Sale proceeds of existing home</label>
-            <input id="srcEquity" inputmode="decimal" placeholder="0" value="0" />
-          </div>
-
-          <div>
-            <label>401k / Gift funds</label>
-            <input id="srcOther" inputmode="decimal" placeholder="0" value="0" />
-          </div>
-
-          <div>
-            <label>Sources total</label>
-            <input id="srcTotal" disabled />
-            <div class="hint" id="srcDiffHint"></div>
-          </div>
-        </div>
-
-        <div class="hr"></div>
-
-        <h2>Taxes & insurance</h2>
-        <div class="row">
-          <div>
-            <label>TN County (property tax estimate)</label>
-            <select id="county"></select>
-            <div class="hint">
-              Uses a county rate expressed as <b>$ per $100 of assessed value</b>.
-              Cities / special districts can add additional tax. :contentReference[oaicite:1]{index=1}
-            </div>
-          </div>
-
-          <div>
-            <label>Homeowners Insurance (monthly)</label>
-            <input id="hoi" inputmode="decimal" value="125" />
-          </div>
-        </div>
-
-        <div class="smallnote">
-          TN residential tax math typically uses <b>25% assessed value</b> of appraised value, then applies the rate per <b>$100 of assessed value</b>. :contentReference[oaicite:2]{index=2}
-        </div>
-
-        <div class="foot">
-          Want Davidson’s USD vs GSD nuance? Nashville shows different district rates (Urban vs General Services). :contentReference[oaicite:3]{index=3}
-        </div>
-      </section>
-
-      <!-- OUTPUTS -->
-      <aside class="card">
-        <h2>Results</h2>
-        <div class="kpis">
-          <div class="kpi">
-            <div class="t">Down payment</div>
-            <div class="v" id="outDp">$0</div>
-            <div class="s" id="outDpPct">0% of price</div>
-          </div>
-
-          <div class="kpi">
-            <div class="t">Loan amount</div>
-            <div class="v" id="outLoan">$0</div>
-            <div class="s">Price minus down payment</div>
-          </div>
-
-          <div class="kpi">
-            <div class="t">Estimated monthly P&amp;I</div>
-            <div class="v" id="outPI">$0</div>
-            <div class="s">30-yr fixed estimate</div>
-          </div>
-
-          <div class="kpi">
-            <div class="t">Estimated monthly taxes</div>
-            <div class="v" id="outTax">$0</div>
-            <div class="s" id="outTaxNote">Based on selected county rate</div>
-          </div>
-
-          <div class="kpi">
-            <div class="t">Homeowners insurance (monthly)</div>
-            <div class="v" id="outHOI">$0</div>
-            <div class="s">User input</div>
-          </div>
-
-          <div class="kpi">
-            <div class="t">Estimated total payment (PITI)</div>
-            <div class="v" id="outPITI">$0</div>
-            <div class="s">Principal + Interest + Taxes + Insurance</div>
-          </div>
-
-          <div class="kpi">
-            <div class="t">Funding match</div>
-            <div class="v" id="outMatch">—</div>
-            <div class="s" id="outMatchSub">Sources vs down payment</div>
-          </div>
-        </div>
-
-        <div class="foot">
-          Disclaimer: This is an estimate for planning only. Taxes can vary by <b>city limits / special districts</b>, reassessments, exemptions, and lender escrows.
-        </div>
-      </aside>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Down Payment + Monthly Payment Calculator</h1>
+      <div class="sub">Friendly for first-time buyers and repeat buyers. Down payment can be entered as <b>%</b> or <b>$</b>, and sub-sources roll up automatically.</div>
     </div>
+    <div class="rightTop">
+      <span class="pill">First-Time Buyer?</span>
+      <div class="toggle" role="group" aria-label="First time buyer toggle">
+        <button id="ftbYes" type="button">Yes</button>
+        <button id="ftbNo"  type="button" class="active">No</button>
+      </div>
+      <button class="btn" type="button" id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: Inputs -->
+    <section class="card">
+      <div class="section-title">
+        <h2>Inputs</h2>
+        <div class="mini">Defaults: FTB 3.5% • Repeat 5% • Rate 6.25% • HOI $125/mo</div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="price">Estimated Home Purchase Price</label>
+          <input id="price" inputmode="decimal" placeholder="e.g., 400000" value="400000" />
+        </div>
+        <div>
+          <label for="termYears">Loan Term</label>
+          <select id="termYears">
+            <option value="30" selected>30-year fixed</option>
+            <option value="15">15-year fixed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="dpPct">Down Payment (%)</label>
+          <input id="dpPct" inputmode="decimal" placeholder="e.g., 5" value="5" />
+        </div>
+        <div>
+          <label for="dpAmt">Down Payment ($)</label>
+          <input id="dpAmt" inputmode="decimal" placeholder="e.g., 20000" />
+        </div>
+      </div>
+
+      <div id="lowDpNote" class="note">
+        Heads up: there are loan options available for <b>less than 3.5% down</b>. If that would help, please inquire.
+      </div>
+
+      <div class="hint">
+        Down payment sources (these will <b>sum into</b> your down payment). You can still type a custom DP above — the calculator will sync both ways.
+      </div>
+
+      <div class="subgrid" id="dpSources">
+        <div>
+          <label for="dpSavings">Savings</label>
+          <input id="dpSavings" inputmode="decimal" placeholder="0" value="0" />
+        </div>
+        <div id="equityWrap">
+          <label for="dpEquity">Equity / Sale Proceeds</label>
+          <input id="dpEquity" inputmode="decimal" placeholder="0" value="0" />
+        </div>
+        <div>
+          <label for="dp401kGift">401k / Gift Funds</label>
+          <input id="dp401kGift" inputmode="decimal" placeholder="0" value="0" />
+        </div>
+        <div>
+          <label for="dpOther">Other</label>
+          <input id="dpOther" inputmode="decimal" placeholder="0" value="0" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="rate">Interest Rate (%)</label>
+          <input id="rate" inputmode="decimal" value="6.25" />
+        </div>
+        <div>
+          <label for="hoi">Homeowners Insurance ($/month)</label>
+          <input id="hoi" inputmode="decimal" value="125" />
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:14px;">
+        <h2>Property Taxes</h2>
+        <div class="mini">Uses “rate per $100 of assessed value” (TN residential assessed = 25%).</div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="county">TN County</label>
+          <select id="county"></select>
+        </div>
+        <div>
+          <label for="district">Inside City / Special District</label>
+          <select id="district"></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="cityAddon">Optional City Add-on (if applicable)</label>
+          <select id="cityAddon"></select>
+          <div class="mini" style="margin-top:6px;">If you’re not sure, leave as “None” and we’ll err conservative by using the district selection above.</div>
+        </div>
+        <div>
+          <label for="taxRateOverride">Tax Rate Override (per $100 assessed)</label>
+          <input id="taxRateOverride" inputmode="decimal" placeholder="Leave blank to use dropdown rate" />
+          <div class="mini" style="margin-top:6px;">If a specific address has a different rate, type it here to override.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Outputs -->
+    <aside class="card">
+      <div class="section-title">
+        <h2>Results</h2>
+        <div class="mini">Estimated (not a quote)</div>
+      </div>
+
+      <div class="out">
+        <div class="kpi">
+          <div class="k">Down Payment</div>
+          <div class="v" id="kpiDp">$0</div>
+          <div class="s" id="kpiDpPct">0%</div>
+        </div>
+        <div class="kpi">
+          <div class="k">Loan Amount</div>
+          <div class="v" id="kpiLoan">$0</div>
+          <div class="s" id="kpiTermRate">30y • 6.25%</div>
+        </div>
+        <div class="kpi">
+          <div class="k">Principal + Interest</div>
+          <div class="v" id="kpiPI">$0/mo</div>
+          <div class="s">P&I only</div>
+        </div>
+        <div class="kpi">
+          <div class="k">Taxes + Insurance</div>
+          <div class="v" id="kpiTI">$0/mo</div>
+          <div class="s" id="kpiTaxRate">Tax rate: —</div>
+        </div>
+      </div>
+
+      <div class="kpi" style="margin-top:10px; border-color: rgba(93,214,255,.35); background: rgba(93,214,255,.10);">
+        <div class="k">Estimated Total Monthly Payment</div>
+        <div class="v" id="kpiTotal">$0/mo</div>
+        <div class="s">P&I + taxes + insurance (no PMI/HOA shown)</div>
+      </div>
+
+      <div id="taxWarn" class="note danger" style="margin-top:12px;">
+        Property taxes can vary by address (city limits, special districts). If the number looks off, use the override box.
+      </div>
+
+      <footer>
+        Notes:
+        <ul>
+          <li>This does not include PMI, HOA, flood insurance, points/credits, or escrow adjustments.</li>
+          <li>TN residential assessed value is typically <b>25%</b> of appraised value. :contentReference[oaicite:1]{index=1}</li>
+          <li>Davidson USD/GSD example rates are shown from Metro Trustee calculator. :contentReference[oaicite:2]{index=2}</li>
+          <li>Williamson County + FSSD and city rates pulled from the county’s 2025 rate sheet (incl. inside/outside Franklin + FSSD). :contentReference[oaicite:3]{index=3}</li>
+          <li>Sumner County base rate example shown by county guidance (1.421) and Gallatin city rate page. :contentReference[oaicite:4]{index=4}</li>
+          <li>Rutherford base rate and Smyrna city rate confirmed by Rutherford Trustee FAQ; La Vergne city rate from city site. :contentReference[oaicite:5]{index=5}</li>
+          <li>Montgomery County base rate from county tax rates page; Clarksville city rate can change—verify if needed. :contentReference[oaicite:6]{index=6}</li>
+          <li>Wilson county rates below are from Wilson County’s posted rate list (page shown for 2022); verify current year if needed. :contentReference[oaicite:7]{index=7}</li>
+        </ul>
+      </footer>
+    </aside>
   </div>
+</div>
 
 <script>
-/**
- * Notes:
- * - Down payment can be entered as % or $. Whichever the user edits last drives the value.
- * - County rates are placeholders for a "county-only" planning estimate.
- *   Replace/add rates as you like (or expand to city/district layers).
- *
- * TN tax formula used (typical):
- *   assessedValue = appraisedValue * 0.25
- *   annualTaxes = (assessedValue / 100) * taxRatePer100Assessed
- */
+(function(){
+  const $ = (id)=>document.getElementById(id);
 
-// ---------- County tax rate table (planning) ----------
-// Rates are expressed as "$ per $100 of assessed value".
-// Populate with the counties you care about most first.
-// (Example: Nashville shows district rates in the ~$2.7–$2.8+ range per $100 assessed.) 
-// See Nashville example of GSD/USD. 
-const COUNTY_RATES = [
-  // Middle TN starters (edit these as you wish)
-  { name: "Davidson (county baseline – planning)", rate: 2.782 }, // Nashville GSD example rate per $100 assessed value. :contentReference[oaicite:4]{index=4}
-  { name: "Montgomery (example)", rate: 2.10 }, // Montgomery County example rate. :contentReference[oaicite:5]{index=5}
-  { name: "Williamson (set by jurisdiction)", rate: 1.90 }, // Placeholder (county changes; replace with current). :contentReference[oaicite:6]{index=6}
-  { name: "Rutherford (placeholder)", rate: 2.35 },
-  { name: "Sumner (placeholder)", rate: 2.20 },
-  { name: "Wilson (placeholder)", rate: 2.10 },
-  // Generic option
-  { name: "Other / Not sure (use a cautious estimate)", rate: 2.50 }
-];
+  // ---------- Helpers ----------
+  const toNum = (v)=> {
+    if (v === null || v === undefined) return 0;
+    const x = String(v).replace(/[$, ]/g,'').trim();
+    const n = parseFloat(x);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const fmt$ = (n)=> {
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
+  };
+  const fmtPct = (n)=> {
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toFixed(2).replace(/\.00$/,'') + '%';
+  };
 
-// ---------- Helpers ----------
-const $ = (id) => document.getElementById(id);
+  // Mortgage payment
+  function monthlyPI(principal, annualRatePct, years){
+    const r = (annualRatePct/100)/12;
+    const n = years*12;
+    if (principal <= 0) return 0;
+    if (r <= 0) return principal / n;
+    return principal * (r * Math.pow(1+r,n)) / (Math.pow(1+r,n)-1);
+  }
 
-function parseNum(v){
-  if (v === null || v === undefined) return 0;
-  const n = Number(String(v).replace(/[^0-9.\-]/g, ""));
-  return Number.isFinite(n) ? n : 0;
-}
-function fmtMoney(n){
-  if (!Number.isFinite(n)) return "$0";
-  return n.toLocaleString(undefined, { style:"currency", currency:"USD", maximumFractionDigits:0 });
-}
-function fmtMoney2(n){
-  if (!Number.isFinite(n)) return "$0";
-  return n.toLocaleString(undefined, { style:"currency", currency:"USD", maximumFractionDigits:2 });
-}
-function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+  // Property tax monthly (TN residential assessed value = 25% of appraised)
+  function monthlyTax(appraised, ratePer100Assessed){
+    const assessed = appraised * 0.25;
+    const annual = (assessed/100) * ratePer100Assessed;
+    return annual/12;
+  }
 
-// Monthly payment (P&I) - fixed rate mortgage
-function monthlyPI(principal, annualRatePct, years=30){
-  const r = (annualRatePct/100) / 12;
-  const n = years * 12;
-  if (principal <= 0) return 0;
-  if (r <= 0) return principal / n;
-  const pmt = principal * (r * Math.pow(1+r, n)) / (Math.pow(1+r, n) - 1);
-  return pmt;
-}
+  // ---------- Tax Rate Data (editable) ----------
+  // Rates here are "per $100 of assessed value".
+  // Keep them simple: County + district. Optional city add-ons are separate.
+  const TAX = {
+    "Davidson": {
+      districts: [
+        { key:"GSD", label:"Outside Urban Services (GSD)", rate: 2.782 },
+        { key:"USD", label:"Inside Urban Services (USD)", rate: 2.814 }
+      ],
+      cityAddons: [
+        { key:"none", label:"None / Not sure", add: 0 }
+      ]
+    },
+    "Williamson": {
+      // From Williamson County 2025 rate sheet (includes special handling for FSSD and inside/outside Franklin)
+      // We'll offer the exact combined totals shown so user doesn't have to do the math. :contentReference[oaicite:8]{index=8}
+      districts: [
+        { key:"WIL_CO", label:"Williamson County (most areas)", rate: 1.30 },
+        { key:"IN_FRANKLIN_FSSD", label:"Inside Franklin + FSSD", rate: 1.7673 },
+        { key:"OUT_FRANKLIN_FSSD", label:"Outside Franklin + FSSD", rate: 1.7973 },
+        { key:"INSIDE_FRANKLIN_NOFSSD", label:"Inside Franklin & Spring Hill (No FSSD)", rate: 1.27 },
+        { key:"INSIDE_BRENT_FAIR_THOMP_NOL", label:"Inside Brentwood/Fairview/Thompson’s Station/Nolensville (county base)", rate: 1.30 }
+      ],
+      cityAddons: [
+        { key:"none", label:"None / Included above", add: 0 },
+        { key:"brentwood", label:"Add City of Brentwood", add: 0.1900 },
+        { key:"franklin", label:"Add City of Franklin", add: 0.2960 },
+        { key:"nolensville", label:"Add Town of Nolensville", add: 0.3400 },
+        { key:"thompsons", label:"Add Thompson’s Station", add: 0.1030 },
+        { key:"fairview", label:"Add City of Fairview", add: 0.5904 },
+        { key:"springhill", label:"Add City of Spring Hill", add: 0.7390 }
+      ]
+    },
+    "Sumner": {
+      // County base rate example (Sumner county guidance shows 1.421). :contentReference[oaicite:9]{index=9}
+      districts: [
+        { key:"SUM_CO", label:"Sumner County (base)", rate: 1.4210 }
+      ],
+      cityAddons: [
+        { key:"none", label:"None", add: 0 },
+        { key:"gallatin", label:"Add City of Gallatin", add: 0.5295 } // :contentReference[oaicite:10]{index=10}
+        // You can add more (Hendersonville, Goodlettsville, etc.) anytime.
+      ]
+    },
+    "Rutherford": {
+      districts: [
+        { key:"RUTH_CO", label:"Rutherford County (base)", rate: 1.8762 } // :contentReference[oaicite:11]{index=11}
+      ],
+      cityAddons: [
+        { key:"none", label:"None", add: 0 },
+        { key:"smyrna", label:"Add Town of Smyrna", add: 0.5257 }, // :contentReference[oaicite:12]{index=12}
+        { key:"lavergne", label:"Add City of La Vergne", add: 0.5363 } // :contentReference[oaicite:13]{index=13}
+        // Murfreesboro rate varies by year; add if you want once you confirm the current rate.
+      ]
+    },
+    "Wilson": {
+      // Wilson County page shown is for 2022 rates; included as a starting point. :contentReference[oaicite:14]{index=14}
+      districts: [
+        { key:"WIL_CO", label:"Wilson County (base)", rate: 1.9089 },
+        { key:"LEB_SSD", label:"Lebanon Special School District (add-on district)", rate: (1.9089 + 0.2973) }
+      ],
+      cityAddons: [
+        { key:"none", label:"None", add: 0 },
+        { key:"lebanon", label:"Add City of Lebanon", add: 0.6855 }, // city page confirms 0.6855 :contentReference[oaicite:15]{index=15}
+        { key:"mtjuliet", label:"Add City of Mt. Juliet", add: 0.1100 },
+        { key:"watertown", label:"Add City of Watertown", add: 0.6027 }
+      ]
+    },
+    "Montgomery": {
+      districts: [
+        { key:"MONT_CO", label:"Montgomery County (base)", rate: 2.10 } // :contentReference[oaicite:16]{index=16}
+      ],
+      cityAddons: [
+        { key:"none", label:"None", add: 0 },
+        { key:"clarksville", label:"Add City of Clarksville", add: 0.88 } // :contentReference[oaicite:17]{index=17}
+      ]
+    }
+  };
 
-// ---------- State ----------
-let isFTHB = true;
-let lastDpDriver = "pct"; // "pct" or "amt"
+  // ---------- Elements ----------
+  const els = {
+    price: $("price"),
+    termYears: $("termYears"),
+    dpPct: $("dpPct"),
+    dpAmt: $("dpAmt"),
+    dpSavings: $("dpSavings"),
+    dpEquity: $("dpEquity"),
+    dp401kGift: $("dp401kGift"),
+    dpOther: $("dpOther"),
+    equityWrap: $("equityWrap"),
+    rate: $("rate"),
+    hoi: $("hoi"),
+    county: $("county"),
+    district: $("district"),
+    cityAddon: $("cityAddon"),
+    taxRateOverride: $("taxRateOverride"),
+    lowDpNote: $("lowDpNote"),
+    taxWarn: $("taxWarn"),
+    ftbYes: $("ftbYes"),
+    ftbNo: $("ftbNo"),
+    resetBtn: $("resetBtn"),
 
-// ---------- Init ----------
-function initCountyDropdown(){
-  const sel = $("county");
-  sel.innerHTML = "";
-  COUNTY_RATES.forEach((c, idx) => {
-    const opt = document.createElement("option");
-    opt.value = String(idx);
-    opt.textContent = `${c.name} — ${c.rate.toFixed(3)} / $100 assessed`;
-    sel.appendChild(opt);
+    kpiDp: $("kpiDp"),
+    kpiDpPct: $("kpiDpPct"),
+    kpiLoan: $("kpiLoan"),
+    kpiTermRate: $("kpiTermRate"),
+    kpiPI: $("kpiPI"),
+    kpiTI: $("kpiTI"),
+    kpiTaxRate: $("kpiTaxRate"),
+    kpiTotal: $("kpiTotal"),
+  };
+
+  let isFTB = false;
+  let lockSync = false; // prevent circular updates
+
+  // ---------- Populate county dropdown ----------
+  function populateCounties(){
+    els.county.innerHTML = "";
+    Object.keys(TAX).forEach((c)=>{
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c + " County";
+      els.county.appendChild(opt);
+    });
+    // Default (feel free to change): Davidson
+    els.county.value = "Davidson";
+    populateDistrictsAndAddons();
+  }
+
+  function populateDistrictsAndAddons(){
+    const c = els.county.value;
+    els.district.innerHTML = "";
+    TAX[c].districts.forEach(d=>{
+      const opt = document.createElement("option");
+      opt.value = d.key;
+      opt.textContent = d.label + " (" + d.rate.toFixed(4).replace(/0+$/,'').replace(/\.$/,'') + ")";
+      els.district.appendChild(opt);
+    });
+
+    els.cityAddon.innerHTML = "";
+    TAX[c].cityAddons.forEach(a=>{
+      const opt = document.createElement("option");
+      opt.value = a.key;
+      opt.textContent = a.label + (a.add ? ` (+${a.add.toFixed(4).replace(/0+$/,'').replace(/\.$/,'')})` : "");
+      els.cityAddon.appendChild(opt);
+    });
+
+    // “err on higher side” gently: for Davidson, default USD; otherwise first option.
+    if (c === "Davidson"){
+      els.district.value = "USD";
+    } else {
+      els.district.selectedIndex = 0;
+    }
+    els.cityAddon.value = "none";
+    els.taxWarn.style.display = "block";
+    recalc();
+  }
+
+  function getSelectedTaxRate(){
+    const c = els.county.value;
+    const distKey = els.district.value;
+    const district = TAX[c].districts.find(d=>d.key===distKey);
+    const addonKey = els.cityAddon.value;
+    const addon = TAX[c].cityAddons.find(a=>a.key===addonKey);
+
+    let rate = (district ? district.rate : 0) + (addon ? addon.add : 0);
+
+    const override = toNum(els.taxRateOverride.value);
+    if (override > 0) rate = override;
+
+    return rate;
+  }
+
+  // ---------- FTB toggle logic ----------
+  function applyFTBState(){
+    els.ftbYes.classList.toggle("active", isFTB);
+    els.ftbNo.classList.toggle("active", !isFTB);
+
+    // show/hide equity box
+    els.equityWrap.style.display = isFTB ? "none" : "block";
+    // Default down payment percent
+    els.dpPct.value = isFTB ? "3.5" : "5";
+    // If switching to FTB, clear equity
+    if (isFTB) els.dpEquity.value = "0";
+
+    // For FTB, nudge county selection? leave as-is.
+    recalcFromPct(); // keep things consistent
+  }
+
+  // ---------- Down payment syncing ----------
+  function dpSourcesSum(){
+    return toNum(els.dpSavings.value) + toNum(els.dpEquity.value) + toNum(els.dp401kGift.value) + toNum(els.dpOther.value);
+  }
+
+  function recalcFromPct(){
+    if (lockSync) return;
+    lockSync = true;
+    const price = toNum(els.price.value);
+    let pct = toNum(els.dpPct.value);
+    if (pct < 0) pct = 0;
+    const amt = price * (pct/100);
+    els.dpAmt.value = amt ? String(Math.round(amt)) : "";
+    // also distribute: if sources are all zero, set savings = dpAmt (nice UX)
+    if (dpSourcesSum() === 0 && amt > 0){
+      els.dpSavings.value = String(Math.round(amt));
+    }
+    lockSync = false;
+    recalc();
+  }
+
+  function recalcFromAmt(){
+    if (lockSync) return;
+    lockSync = true;
+    const price = toNum(els.price.value);
+    let amt = toNum(els.dpAmt.value);
+    if (amt < 0) amt = 0;
+    const pct = price > 0 ? (amt/price)*100 : 0;
+    els.dpPct.value = pct ? pct.toFixed(3).replace(/0+$/,'').replace(/\.$/,'') : "0";
+    if (dpSourcesSum() === 0 && amt > 0){
+      els.dpSavings.value = String(Math.round(amt));
+    }
+    lockSync = false;
+    recalc();
+  }
+
+  function recalcFromSources(){
+    if (lockSync) return;
+    lockSync = true;
+    const price = toNum(els.price.value);
+    const amt = dpSourcesSum();
+    els.dpAmt.value = amt ? String(Math.round(amt)) : "";
+    const pct = price > 0 ? (amt/price)*100 : 0;
+    els.dpPct.value = pct ? pct.toFixed(3).replace(/0+$/,'').replace(/\.$/,'') : "0";
+    lockSync = false;
+    recalc();
+  }
+
+  // ---------- Recalc everything ----------
+  function recalc(){
+    const price = toNum(els.price.value);
+    const term = parseInt(els.termYears.value,10) || 30;
+    const rate = toNum(els.rate.value);
+    const dpAmt = toNum(els.dpAmt.value);
+    const dpPct = price > 0 ? (dpAmt/price)*100 : 0;
+
+    // Soft warning if DP% < 3.5
+    els.lowDpNote.style.display = (dpPct > 0 && dpPct < 3.5) ? "block" : "none";
+
+    const loan = Math.max(0, price - dpAmt);
+    const pi = monthlyPI(loan, rate, term);
+
+    const taxRate = getSelectedTaxRate();
+    const taxes = monthlyTax(price, taxRate);
+
+    const hoi = toNum(els.hoi.value);
+    const ti = taxes + hoi;
+    const total = pi + ti;
+
+    els.kpiDp.textContent = fmt$(dpAmt);
+    els.kpiDpPct.textContent = fmtPct(dpPct);
+    els.kpiLoan.textContent = fmt$(loan);
+    els.kpiTermRate.textContent = `${term}y • ${rate.toFixed(2).replace(/\.00$/,'')}%`;
+    els.kpiPI.textContent = fmt$(pi) + "/mo";
+    els.kpiTI.textContent = fmt$(ti) + "/mo";
+
+    const override = toNum(els.taxRateOverride.value);
+    const rateLabel = override > 0 ? `${override.toFixed(4).replace(/0+$/,'').replace(/\.$/,'')} (override)` :
+      `${taxRate.toFixed(4).replace(/0+$/,'').replace(/\.$/,'')}`;
+    els.kpiTaxRate.textContent = `Tax rate: ${rateLabel} per $100 assessed`;
+
+    els.kpiTotal.textContent = fmt$(total) + "/mo";
+  }
+
+  // ---------- Events ----------
+  els.ftbYes.addEventListener("click", ()=>{ isFTB = true; applyFTBState(); });
+  els.ftbNo.addEventListener("click",  ()=>{ isFTB = false; applyFTBState(); });
+
+  els.resetBtn.addEventListener("click", ()=>{
+    isFTB = false;
+    els.price.value = "400000";
+    els.termYears.value = "30";
+    els.rate.value = "6.25";
+    els.hoi.value = "125";
+    els.dpSavings.value = "0";
+    els.dpEquity.value = "0";
+    els.dp401kGift.value = "0";
+    els.dpOther.value = "0";
+    els.taxRateOverride.value = "";
+    populateCounties();
+    applyFTBState();
   });
-  sel.value = "0";
-}
 
-function setMode(fthb){
-  isFTHB = fthb;
-  $("btnYes").classList.toggle("active", fthb);
-  $("btnNo").classList.toggle("active", !fthb);
-  $("modeLabel").textContent = fthb ? "First-time buyer" : "Repeat buyer";
+  els.price.addEventListener("input", ()=>{ recalcFromPct(); });
+  els.termYears.addEventListener("change", recalc);
+  els.rate.addEventListener("input", recalc);
+  els.hoi.addEventListener("input", recalc);
 
-  // default DP%
-  if (lastDpDriver !== "amt") {
-    $("dpPct").value = fthb ? "3.5" : "5";
-  }
+  els.dpPct.addEventListener("input", recalcFromPct);
+  els.dpAmt.addEventListener("input", recalcFromAmt);
 
-  // show/hide equity source box
-  $("equityWrap").style.display = fthb ? "none" : "block";
-  if (fthb) $("srcEquity").value = "0";
+  ["dpSavings","dpEquity","dp401kGift","dpOther"].forEach(id=>{
+    $(id).addEventListener("input", recalcFromSources);
+  });
 
-  recalc();
-}
+  els.county.addEventListener("change", populateDistrictsAndAddons);
+  els.district.addEventListener("change", recalc);
+  els.cityAddon.addEventListener("change", recalc);
+  els.taxRateOverride.addEventListener("input", recalc);
 
-function showDpToast(show){
-  $("dpToast").classList.toggle("show", !!show);
-}
-
-// ---------- Recalc ----------
-function recalc(){
-  const price = Math.max(0, parseNum($("price").value));
-  let dpPct = parseNum($("dpPct").value);
-  let dpAmt = parseNum($("dpAmt").value);
-
-  // keep percent sane
-  dpPct = clamp(dpPct, 0, 100);
-
-  if (lastDpDriver === "pct") {
-    dpAmt = price * (dpPct/100);
-    $("dpAmt").value = dpAmt ? Math.round(dpAmt).toString() : "";
-  } else {
-    dpAmt = clamp(dpAmt, 0, price);
-    dpPct = price > 0 ? (dpAmt/price)*100 : 0;
-    $("dpPct").value = dpPct ? dpPct.toFixed(3).replace(/\.?0+$/,"") : "0";
-  }
-
-  // soft suggestion if under 3.5%
-  const under35 = price > 0 && (dpAmt/price) < 0.035;
-  showDpToast(under35);
-
-  const loan = Math.max(0, price - dpAmt);
-
-  // Sources
-  const s1 = Math.max(0, parseNum($("srcSavings").value));
-  const s2 = isFTHB ? 0 : Math.max(0, parseNum($("srcEquity").value));
-  const s3 = Math.max(0, parseNum($("srcOther").value));
-  const srcTotal = s1 + s2 + s3;
-  $("srcTotal").value = fmtMoney(srcTotal);
-
-  const diff = srcTotal - dpAmt;
-  const absDiff = Math.abs(diff);
-
-  let matchText = "—";
-  let matchSub = "Sources vs down payment";
-  let matchClass = "";
-
-  if (price > 0) {
-    if (absDiff <= Math.max(50, dpAmt * 0.005)) { // within $50 or 0.5%
-      matchText = "Matched";
-      matchSub = "Your sources roughly match the down payment";
-      matchClass = "ok";
-    } else if (diff < 0) {
-      matchText = `Short ${fmtMoney(absDiff)}`;
-      matchSub = "You’re under-funded vs the down payment total";
-      matchClass = "warn";
-    } else {
-      matchText = `Over ${fmtMoney(absDiff)}`;
-      matchSub = "You’re allocating more than the down payment total";
-      matchClass = "warn";
-    }
-  }
-
-  $("outMatch").textContent = matchText;
-  $("outMatchSub").textContent = matchSub;
-  $("outMatch").className = "v " + matchClass;
-
-  // hint under sources total
-  if (price > 0) {
-    if (absDiff <= Math.max(50, dpAmt * 0.005)) {
-      $("srcDiffHint").textContent = "Nice — your sources and down payment are roughly aligned.";
-      $("srcDiffHint").className = "hint ok";
-    } else if (diff < 0) {
-      $("srcDiffHint").textContent = `You’re short by about ${fmtMoney(absDiff)} based on your source breakdown.`;
-      $("srcDiffHint").className = "hint warn";
-    } else {
-      $("srcDiffHint").textContent = `You’re over by about ${fmtMoney(absDiff)} based on your source breakdown.`;
-      $("srcDiffHint").className = "hint warn";
-    }
-  } else {
-    $("srcDiffHint").textContent = "";
-    $("srcDiffHint").className = "hint";
-  }
-
-  // P&I
-  const rate = parseNum($("rate").value);
-  const pi = monthlyPI(loan, rate, 30);
-
-  // Taxes (TN typical formula: assessed = 25% of appraised; apply per $100 assessed)
-  const countyIdx = parseNum($("county").value);
-  const taxRatePer100 = COUNTY_RATES[countyIdx]?.rate ?? 2.50;
-  const assessed = price * 0.25;
-  const annualTaxes = (assessed / 100) * taxRatePer100;
-  const monthlyTaxes = annualTaxes / 12;
-
-  // Insurance
-  const hoi = Math.max(0, parseNum($("hoi").value));
-
-  // Totals
-  const piti = pi + monthlyTaxes + hoi;
-
-  // Outputs
-  $("outDp").textContent
+  // ---------- Init ----------
+  populateCounties();
+  applyFTBState(); // sets default dp
+  // Set dpAmt based on initial dpPct
+  recalcFromPct();
+})();
+</script>
+</body>
+</html>
